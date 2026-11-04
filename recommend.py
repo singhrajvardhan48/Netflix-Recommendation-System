@@ -76,6 +76,100 @@ def load_model_artifacts(
     return movies_df, similarity_matrix
 
 
+def search_catalog(query, movies_df, top_k=50):
+    """
+    Intelligent multi-field search across:
+    - Director Name (e.g., 'Christopher Nolan', 'Quentin Tarantino')
+    - Lead Actor / Cast Names (e.g., 'Leonardo DiCaprio', 'Tom Cruise')
+    - Content / Plot Overview & Tags (e.g., 'Space', 'Zombie', 'Time Travel')
+    - Movie Title & Genres
+    
+    Returns a tuple: (filtered_dataframe, match_category)
+    """
+    if not query or not str(query).strip():
+        return movies_df, "all"
+
+    q = str(query).strip().lower()
+
+    # Exact or substring checks across columns
+    title_exact = movies_df['title'].str.lower() == q
+    title_starts = movies_df['title'].str.lower().str.startswith(q)
+    title_contains = movies_df['title'].str.lower().str.contains(q, regex=False, na=False)
+
+    director_match = movies_df['display_director'].str.lower().str.contains(q, regex=False, na=False)
+    cast_match = movies_df['display_cast'].str.lower().str.contains(q, regex=False, na=False)
+    genre_match = movies_df['display_genres'].str.lower().str.contains(q, regex=False, na=False)
+    overview_match = movies_df['overview'].str.lower().str.contains(q, regex=False, na=False)
+
+    # Cleaned tag search (e.g. 'christophernolan' or 'space')
+    q_collapsed = q.replace(' ', '')
+    tags_match = (
+        movies_df['tags'].str.lower().str.contains(q, regex=False, na=False) |
+        movies_df['tags'].str.lower().str.contains(q_collapsed, regex=False, na=False)
+    )
+
+    # Determine primary match category for UI feedback
+    dir_count = int(director_match.sum())
+    cast_count = int(cast_match.sum())
+    title_count = int(title_contains.sum())
+    genre_count = int(genre_match.sum())
+    content_count = int((overview_match | tags_match).sum())
+
+    if title_exact.sum() > 0:
+        category = "Movie Title"
+    elif dir_count > 0 and dir_count >= cast_count and dir_count >= content_count:
+        category = "Director"
+    elif cast_count > 0 and cast_count >= dir_count and cast_count >= content_count:
+        category = "Lead Actor / Cast"
+    elif genre_count > 0 and genre_count >= dir_count and genre_count >= cast_count:
+        category = "Genre"
+    elif content_count > 0 and content_count > dir_count and content_count > cast_count:
+        category = "Theme / Plot Content"
+    elif dir_count > 0:
+        category = "Director"
+    elif cast_count > 0:
+        category = "Lead Actor / Cast"
+    elif title_count > 0:
+        category = "Movie Title"
+    else:
+        category = "Keyword"
+
+    scores = np.zeros(len(movies_df), dtype=float)
+    scores[title_exact] += 120
+    scores[director_match] += 90
+    scores[cast_match] += 80
+    scores[title_starts & ~title_exact] += 70
+    scores[title_contains & ~title_starts] += 60
+    scores[genre_match] += 40
+    scores[overview_match] += 25
+    scores[tags_match & ~overview_match] += 20
+
+    matched_indices = np.where(scores > 0)[0]
+
+    # If no multi-field hits, try individual words
+    if len(matched_indices) == 0:
+        tokens = [t for t in q.split() if len(t) > 2]
+        for t in tokens:
+            scores += (movies_df['title'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 30)
+            scores += (movies_df['display_director'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 35)
+            scores += (movies_df['display_cast'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 30)
+            scores += (movies_df['tags'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 15)
+        matched_indices = np.where(scores > 0)[0]
+
+    if len(matched_indices) == 0:
+        return movies_df.iloc[0:0], "none"
+
+    matched_df = movies_df.iloc[matched_indices].copy()
+    matched_df['match_score'] = scores[matched_indices]
+
+    matched_df = matched_df.sort_values(
+        by=['match_score', 'popularity', 'vote_average'],
+        ascending=[False, False, False]
+    )
+
+    return matched_df.head(top_k), category
+
+
 def get_api_key(service_name="OMDB_API_KEY"):
     """
     Retrieves API key from environment variable, Streamlit secrets, or local secrets.toml.

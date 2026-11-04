@@ -18,6 +18,7 @@ from recommend import (
     load_model_artifacts,
     recommend,
     fetch_poster_tmdb,
+    search_catalog,
     DEFAULT_POSTER_PATH
 )
 
@@ -229,31 +230,29 @@ if movies_df is None or similarity_matrix is None:
 
 
 # -----------------------------------------------------------------------------
-# 4. Search & Selection Interface
+# 4. Search & Selection Interface (Multi-field: Title, Director, Actor, Content)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <div class="hero-box">
-    <h3 style="margin-top: 0; color: #FFFFFF; font-size: 1.35rem;">Find Movies Similar to What You Love</h3>
+    <h3 style="margin-top: 0; color: #FFFFFF; font-size: 1.35rem;">Find Movies by Director, Actor, Theme, or Title</h3>
     <p style="color: #CCCCCC; font-size: 0.92rem; margin-bottom: 0;">
-        Select or search any movie from the catalog of <strong>4,797 titles</strong>. 
-        Our Content-Based Recommendation algorithm analyzes movie plot overviews, genres, directors, 
-        main cast members, and plot keywords using <code>CountVectorizer</code> and calculates pairwise <code>Cosine Similarity</code> scores.
+        Search any <strong>Director</strong> (e.g. <em>Christopher Nolan, Tarantino</em>), 
+        <strong>Lead Actor</strong> (e.g. <em>Leonardo DiCaprio, Tom Cruise</em>), 
+        <strong>Genre or Plot Theme</strong> (e.g. <em>Space, Zombie, Time Travel</em>), or <strong>Movie Title</strong>.
+        Our engine matches your search and computes pairwise <code>Cosine Similarity</code> recommendations.
     </p>
 </div>
 """, unsafe_allow_html=True)
 
-movie_titles_list = sorted(list(movies_df['title'].unique()))
+all_titles_list = sorted(list(movies_df['title'].unique()))
 
-col_search, col_count = st.columns([3, 1])
+col_search_box, col_count = st.columns([3, 1])
 
-with col_search:
-    default_movie = "Avatar" if "Avatar" in movie_titles_list else movie_titles_list[0]
-    default_index = movie_titles_list.index(default_movie)
-    selected_movie = st.selectbox(
-        "Search or Select a Movie:",
-        options=movie_titles_list,
-        index=default_index,
-        help="Type to search through all 4,797 movies"
+with col_search_box:
+    search_query = st.text_input(
+        "🔍 Search Director, Lead Actor, Content Theme, or Movie Title:",
+        placeholder="e.g. Christopher Nolan, Leonardo DiCaprio, Space, Zombie, Avatar...",
+        help="Type any director name, actor name, plot keyword, genre, or movie title"
     )
 
 with col_count:
@@ -263,7 +262,38 @@ with col_count:
         index=0
     )
 
-recommend_button = st.button("🎬 Recommend Movies", use_container_width=True)
+# Filter catalog based on search query
+if search_query and search_query.strip():
+    search_results, match_category = search_catalog(search_query, movies_df, top_k=50)
+    if not search_results.empty:
+        available_options = search_results['title'].tolist()
+        st.markdown(
+            f"<div style='margin-bottom: 8px; color: #46d369; font-size: 0.95rem; font-weight: bold;'>"
+            f"✨ Found {len(search_results)} movies matching {match_category}: <em>'{search_query.strip()}'</em>"
+            f"</div>",
+            unsafe_allow_html=True
+        )
+    else:
+        st.warning(f"No direct matches found for '{search_query.strip()}'. Showing all movies from catalog.")
+        available_options = all_titles_list
+else:
+    available_options = all_titles_list
+
+col_select, col_btn = st.columns([3, 1])
+
+with col_select:
+    default_movie = "Avatar" if ("Avatar" in available_options and not search_query) else available_options[0]
+    default_index = available_options.index(default_movie) if default_movie in available_options else 0
+    selected_movie = st.selectbox(
+        "Select Movie to Recommend From:",
+        options=available_options,
+        index=default_index,
+        help="Select a movie from the search results to see detailed information and top recommendations"
+    )
+
+with col_btn:
+    st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+    recommend_button = st.button("🎬 Recommend Movies", use_container_width=True)
 
 # -----------------------------------------------------------------------------
 # 5. Selected Movie Spotlight

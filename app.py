@@ -265,7 +265,20 @@ with col_count:
 # Filter catalog based on search query
 if search_query and search_query.strip():
     search_results, match_category = search_catalog(search_query, movies_df, top_k=50)
-    if not search_results.empty:
+    if search_results.empty:
+        st.markdown(f"""
+        <div style="background-color: #2b1214; border-left: 5px solid #E50914; padding: 18px 24px; border-radius: 6px; margin-top: 15px; margin-bottom: 25px;">
+            <h3 style="color: #ff4b4b; margin: 0 0 8px 0; font-size: 1.25rem;">❌ Record Not Found / No Match Found</h3>
+            <p style="color: #FFFFFF; font-size: 1.0rem; margin: 0 0 6px 0;">
+                No movie, director, actor, or theme matching <strong>"{search_query.strip()}"</strong> was found in the database.
+            </p>
+            <p style="color: #AAAAAA; font-size: 0.85rem; margin: 0;">
+                Please verify your spelling or try searching for a different movie, director, or actor.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.stop()
+    else:
         available_options = search_results['title'].tolist()
         st.markdown(
             f"<div style='margin-bottom: 8px; color: #46d369; font-size: 0.95rem; font-weight: bold;'>"
@@ -273,9 +286,6 @@ if search_query and search_query.strip():
             f"</div>",
             unsafe_allow_html=True
         )
-    else:
-        st.warning(f"No direct matches found for '{search_query.strip()}'. Showing all movies from catalog.")
-        available_options = all_titles_list
 else:
     available_options = all_titles_list
 

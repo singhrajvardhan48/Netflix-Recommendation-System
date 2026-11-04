@@ -146,16 +146,7 @@ def search_catalog(query, movies_df, top_k=50):
 
     matched_indices = np.where(scores > 0)[0]
 
-    # If no multi-field hits, try individual words
-    if len(matched_indices) == 0:
-        tokens = [t for t in q.split() if len(t) > 2]
-        for t in tokens:
-            scores += (movies_df['title'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 30)
-            scores += (movies_df['display_director'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 35)
-            scores += (movies_df['display_cast'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 30)
-            scores += (movies_df['tags'].str.lower().str.contains(t, regex=False, na=False).astype(float) * 15)
-        matched_indices = np.where(scores > 0)[0]
-
+    # If no matches found across title, director, cast, genre, overview or tags
     if len(matched_indices) == 0:
         return movies_df.iloc[0:0], "none"
 

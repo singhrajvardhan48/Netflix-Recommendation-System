@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #141414;
+  --foreground: #ffffff;
+  --netflix-red: #E50914;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom Netflix Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E50914;
+}
+
+/* Hide scrollbar for clean carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hero Vignette */
+.hero-vignette {
+  background: linear-gradient(
+    77deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.6) 45%,
+    transparent 85%
+  );
+}
+
+.hero-vignette-bottom {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(20, 20, 20, 0.5) 60%,
+    #141414 100%
+  );
+}
+
+/* Netflix Button Styling */
+.btn-netflix {
+  background-color: #E50914;
+  color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+.btn-netflix:hover {
+  background-color: #b80710;
+  transform: scale(1.02);
+}
+
+/* Card Glow Hover */
+.movie-card-hover {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease;
+}
+.movie-card-hover:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 10px 25px -5px rgba(229, 9, 20, 0.35);
+}
+

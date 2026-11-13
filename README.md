@@ -1,116 +1,159 @@
-# 🎬 Netflix Movie Recommendation System
+# 🎬 Netflix - AI Movie Recommendation System (Full-Stack & Backend)
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/Framework-Streamlit-red.svg)](https://streamlit.io/)
-[![Machine Learning](https://img.shields.io/badge/Algorithm-Content--Based%20Filtering-orange.svg)](https://scikit-learn.org/)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/singhrajvardhan48/Netflix-Recommendation-System)
+[![Next.js](https://img.shields.io/badge/Framework-Next.js%2015-black.svg?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/Frontend-React%2019-blue.svg?logo=react)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
+[![Machine Learning](https://img.shields.io/badge/Algorithm-Cosine%20Similarity-red.svg)](https://scikit-learn.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
 
-A modern, fast, and responsive **Content-Based Movie Recommendation System** built with Python and Streamlit, featuring a Netflix-inspired dark UI. Powered by Natural Language Processing (NLP), Bag-of-Words tokenization (`CountVectorizer`), and vector angle evaluation (`Cosine Similarity`).
+A production-ready, full-stack **Netflix Movie Recommendation System** engineered for seamless, instant 1-click deployment on **Vercel**. Powered by Natural Language Processing (NLP), Bag-of-Words tokenization (`CountVectorizer`), and vector angle evaluation (`Cosine Similarity`) over 4,797 movies.
 
 ---
 
-## 📌 Features
+## 🚀 Key Features
 
-- **Personalized Recommendations:** Computes top recommendations using pairwise cosine similarity across plot overviews, genres, directors, cast members, and keywords.
-- **Netflix Dark Theme:** Custom CSS interface replicating Netflix's sleek dark theme and responsive layout.
-- **Real-Time Poster Fetching:** Integrated with TMDB API to dynamically fetch official movie posters, with a graceful offline fallback placeholder.
-- **Fast & Lightweight:** Optimized model storage using half-precision (`float16`) similarity matrices for rapid load times (<5ms lookup) and minimal disk footprint.
-- **Interactive Search:** Auto-complete search across 4,797 movie titles with adjustable recommendation counts (5–10).
+* **Authentic Netflix Dark Theme:** Sleek Netflix Red (`#E50914`) and Charcoal Black (`#141414`) UI with smooth hover animations and responsive layouts.
+* **Cinematic Hero Showcase:** Featured dynamic backdrop banner with movie metadata, genres, plot overview, and quick action buttons.
+* **Intelligent Multi-Field Search:**
+  * 🎬 **Director Search:** Search any director (e.g. *Christopher Nolan*, *Quentin Tarantino*, *Steven Spielberg*) to list their films.
+  * 🌟 **Lead Actor Search:** Search any actor (e.g. *Leonardo DiCaprio*, *Tom Cruise*, *Brad Pitt*) to discover their films.
+  * 🚀 **Theme / Plot Search:** Search plot concepts like *Space*, *Zombie*, *Time travel*, *Superhero*, or *Mafia*.
+  * 🍿 **Movie Title Search:** Instant title matching.
+  * ❌ **Smart Record Not Found:** If a title is not in the dataset, displays an explicit, stylish "Record Not Found" notice with helpful search recommendations instead of random results.
+* **Interactive AI Recommendation Engine:**
+  * Select any movie from the 4,797 catalog.
+  * Configurable recommendation count (5 to 12).
+  * Calculates and displays similar titles with pairwise Cosine Similarity Match Percentages (e.g. `96% Match`, `92% Match`).
+* **Curated Netflix Carousels:** Smooth horizontal-scrolling rows for *Trending Blockbusters*, *Top Rated Masterpieces*, *Directed by Christopher Nolan*, *Starring Leonardo DiCaprio*, *Sci-Fi & Time Travel*, and *Action*.
+* **Deep Dive Movie Details Modal:** High-resolution backdrops, TMDB posters, ratings, release years, director & cast chips, plot synopses, and 1-click "Find Similar Movies".
+* **Ultra-Fast Serverless Backend:** Zero cold start, sub-millisecond API response times optimized for Vercel's global edge network.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Technology | Purpose |
+| Layer | Technologies |
 | :--- | :--- |
-| **Python 3** | Core programming language |
-| **Pandas & NumPy** | Data manipulation, feature engineering, and matrix operations |
-| **Scikit-Learn** | NLP text vectorization (`CountVectorizer`) and `cosine_similarity` |
-| **Streamlit** | Interactive Netflix-themed dark web application UI |
-| **TMDB API** | Dynamic retrieval of high-resolution movie posters |
-| **Pickle** | High-speed model artifact serialization |
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Lucide Icons |
+| **Backend API** | Next.js Serverless API Route Handlers (`/api/*`) |
+| **Machine Learning** | CountVectorizer (5,000 features, English stop words), Pairwise Cosine Similarity |
+| **Data & Storage** | Lightweight precalculated JSON vector maps (`movies.json`, `recommendations.json`) |
+| **APIs Integrated** | TMDB API (The Movie Database) for high-resolution posters & backdrops |
+| **Alternative UI** | Python Streamlit (`app.py`, `recommend.py`) |
+| **Deployment** | Vercel (1-Click, Zero-Config) |
 
 ---
 
-## 📂 Project Directory Structure
+## 🌐 REST Backend API Endpoints
+
+The full-stack application includes a robust REST API deployable directly to Vercel:
+
+| Endpoint | Method | Description | Sample Query |
+| :--- | :--- | :--- | :--- |
+| `/api/recommend` | `GET` | Computes top recommendations with Cosine Similarity match % | `/api/recommend?title=Inception&limit=5` |
+| `/api/search` | `GET` | Multi-field search across Director, Actor, Theme, and Title | `/api/search?q=Christopher+Nolan` |
+| `/api/movies` | `GET` | Paginated movie catalog with filtering & sorting | `/api/movies?page=1&limit=20&sortBy=popularity` |
+| `/api/movie/[id]` | `GET` | Retrieves single movie details by TMDB ID or title | `/api/movie/19995` or `/api/movie/Avatar` |
+| `/api/poster/[id]` | `GET` | Cached TMDB proxy for high-resolution posters & backdrops | `/api/poster/19995` |
+
+---
+
+## ⚡ How to Deploy on Vercel (1-Click)
+
+1. Push your code to your GitHub repository:
+   `https://github.com/singhrajvardhan48/Netflix-Recommendation-System`
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New"** > **"Project"**.
+3. Import your **`Netflix-Recommendation-System`** repository.
+4. Vercel will automatically detect **Next.js**. Click **Deploy**!
+5. Your application will be live worldwide in under 1 minute with free HTTPS.
+
+---
+
+## 💻 Local Development
+
+### Option 1: Run the Full-Stack Next.js App (Recommended)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Run local development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Option 2: Run the Streamlit Prototype
+
+```bash
+# 1. Install Python dependencies
+pip install -r requirements.txt
+
+# 2. Run Streamlit application
+python -m streamlit run app.py
+```
+
+Open [http://localhost:8501](http://localhost:8501) in your browser.
+
+---
+
+## 📂 Project Structure
 
 ```text
 Netflix-Recommendation-System/
-├── app.py                      # Streamlit web application frontend
-├── recommend.py                # Recommender engine & TMDB poster retrieval
-├── train_model.py              # Model training utility runner
-├── requirements.txt            # Python dependencies
-├── README.md                   # Project documentation
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── movie/[id]/route.ts     # Single movie API
+│   │   │   ├── movies/route.ts         # Paginated catalog API
+│   │   │   ├── poster/[id]/route.ts    # TMDB poster proxy API
+│   │   │   ├── recommend/route.ts      # Cosine similarity recommender API
+│   │   │   └── search/route.ts         # Multi-field search API
+│   │   ├── globals.css                 # Netflix styling & custom scrollbars
+│   │   ├── layout.tsx                  # Root layout & Netflix metadata
+│   │   └── page.tsx                    # Main Netflix interactive home page
+│   ├── components/
+│   │   ├── Navbar.tsx                  # Top navigation bar
+│   │   ├── HeroBanner.tsx              # Cinematic hero trailer banner
+│   │   ├── SearchSection.tsx           # Multi-field search & "Not Found" state
+│   │   ├── RecommendationEngine.tsx    # Interactive AI recommendation spotlight
+│   │   ├── MovieRow.tsx                # Horizontal carousel row
+│   │   ├── MovieCard.tsx               # Movie poster card with match %
+│   │   └── MovieModal.tsx              # Deep-dive detail modal
+│   └── lib/
+│       ├── movies.ts                   # Core search & recommendation logic
+│       └── types.ts                    # TypeScript data definitions
 │
 ├── data/
-│   └── movies.csv              # Cleaned movie metadata & tags dataset (4,797 movies)
+│   ├── movies.csv                      # Cleaned movie metadata dataset (4,797 movies)
+│   ├── movies.json                     # Optimized metadata catalog for Vercel
+│   └── recommendations.json            # Precalculated Cosine Similarity index
 │
-├── models/
-│   ├── movie_list.pkl          # Serialized movie metadata DataFrame
-│   └── similarity.pkl          # Serialized pairwise similarity matrix (float16)
+├── public/
+│   └── default_poster.png              # Fallback offline poster
 │
-├── assets/
-│   └── default_poster.png      # Offline fallback Netflix poster placeholder
+├── scripts/
+│   └── prepare_data.py                 # Data generator & vectorizer script
 │
-└── .streamlit/
-    └── config.toml             # Streamlit Netflix dark theme configuration
+├── app.py                              # Streamlit frontend app
+├── recommend.py                        # Python recommendation engine
+├── train_model.py                      # Python ML model training runner
+├── requirements.txt                    # Python dependencies
+├── package.json                        # Node.js dependencies & scripts
+├── next.config.mjs                     # Next.js configuration
+├── tailwind.config.ts                  # Netflix design system & colors
+├── vercel.json                         # Vercel deployment configuration
+└── README.md                           # Documentation
 ```
 
 ---
 
 ## 🧠 Machine Learning Methodology
 
-```mermaid
-graph TD
-    A[Movie Metadata & Overviews] --> B[Feature Extraction: Genres + Keywords + Cast + Director]
-    B --> C[Entity Space Collapsing: 'James Cameron' -> 'JamesCameron']
-    C --> D[Tags Formulation]
-    D --> E[CountVectorizer: 5000 Features, English Stopwords]
-    E --> F[Feature Matrix: 4,797 Movies x 5,000 Dimensions]
-    F --> G[Pairwise Cosine Similarity: 4,797 x 4,797 Matrix]
-    G --> H[Model Serialization: models/similarity.pkl]
-    H --> I[Streamlit App & TMDB Poster Integration]
-    I --> J[Top N Recommended Movie Cards]
-```
-
-### 1. CountVectorizer (Bag of Words)
-Each movie's combined textual description (`tags`) is converted into a numerical vector using `sklearn.feature_extraction.text.CountVectorizer`:
-* **`max_features=5000`:** Retains the 5,000 most frequent informational words across the entire movie corpus.
-* **`stop_words='english'`:** Automatically filters uninformative filler words (*the, is, and, at, which*).
-* **Output:** A dense numerical matrix of dimensions $(4797, 5000)$.
-
-### 2. Cosine Similarity Calculation
-Rather than Euclidean distance (which is biased by the length of a movie's synopsis), **Cosine Similarity** evaluates the directional angle $\theta$ between two vectors in multi-dimensional space:
-
 $$\text{Cosine Similarity}(A, B) = \cos(\theta) = \frac{A \cdot B}{\|A\| \|B\|} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \sqrt{\sum_{i=1}^{n} B_i^2}}$$
 
-* $\cos(0^\circ) = 1.0$: Identical match (100%).
-* $\cos(90^\circ) = 0.0$: Orthogonal, zero shared features.
-
----
-
-## 🚀 Installation & How to Run
-
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/singhrajvardhan48/Netflix-Recommendation-System.git
-cd Netflix-Recommendation-System
-```
-
-### Step 2: Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### Step 3: (Optional) Retrain or Re-generate Models
-The repository includes pre-built model artifacts in `models/`. To retrain from `data/movies.csv`:
-```bash
-python train_model.py
-```
-
-### Step 4: Run the Streamlit Application
-```bash
-streamlit run app.py
-```
-
-Open your browser and navigate to `http://localhost:8501`.
+1. **Feature Engineering:** Combines Overview, Genres, Plot Keywords, Top 3 Cast Members, and Director into collapsed semantic tag strings.
+2. **CountVectorizer:** Converts text tokens into a dense 5,000-dimensional bag-of-words space while removing English stopwords.
+3. **Pairwise Cosine Similarity:** Computes directional vector angles between all 4,797 movies to rank the most contextually relevant titles.
+4. **Vercel Optimization:** High-frequency top recommendations are indexed for instant sub-millisecond retrieval on serverless edge functions.

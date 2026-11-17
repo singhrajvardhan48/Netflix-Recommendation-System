@@ -114,26 +114,29 @@ export default function SearchSection({ onSelectMovie, onOpenModal, initialQuery
 
       {/* Search Input Box */}
       <div className="max-w-3xl mx-auto mb-6">
-        <div className="relative flex items-center shadow-2xl rounded-full bg-neutral-900 border-2 border-neutral-700 focus-within:border-netflix-red transition-all">
-          <Search className="absolute left-5 w-5 h-5 text-neutral-400" />
+        <div className="relative flex items-center shadow-2xl rounded-full bg-neutral-900/90 backdrop-blur border-2 border-neutral-700 focus-within:border-netflix-red transition-all">
+          <Search className="absolute left-4 sm:left-5 w-5 h-5 text-neutral-400 pointer-events-none" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type e.g. Christopher Nolan, Leonardo DiCaprio, Space, Zombie, Avatar..."
-            className="w-full bg-transparent text-white pl-13 pr-24 py-3.5 text-sm md:text-base focus:outline-none placeholder:text-neutral-500 rounded-full"
+            className="w-full bg-transparent text-white pl-12 sm:pl-14 pr-32 sm:pr-36 py-3.5 text-sm md:text-base focus:outline-none placeholder:text-neutral-500 rounded-full"
           />
-          <div className="absolute right-3 flex items-center gap-1.5">
+          <div className="absolute right-2 sm:right-3 flex items-center gap-1.5">
             {query && (
               <button
+                type="button"
                 onClick={handleClear}
                 className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-neutral-800 transition"
+                title="Clear search"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
             <button
+              type="button"
               onClick={() => executeSearch(query)}
               disabled={loading}
               className="btn-netflix font-bold text-xs md:text-sm px-4 py-2 rounded-full cursor-pointer flex items-center gap-1.5 disabled:opacity-50"

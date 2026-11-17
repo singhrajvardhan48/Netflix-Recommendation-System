@@ -83,6 +83,41 @@ st.markdown("""
         letter-spacing: 1px;
     }
 
+    /* Clean Search Card */
+    .search-card {
+        background: linear-gradient(180deg, #1f1f1f 0%, #161616 100%);
+        border: 1px solid #2e2e2e;
+        border-left: 5px solid #E50914;
+        border-radius: 8px;
+        padding: 20px 24px;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .search-card h3 {
+        margin: 0 0 6px 0;
+        color: #FFFFFF;
+        font-size: 1.3rem;
+        font-weight: 800;
+    }
+    .search-card p {
+        margin: 0;
+        color: #AAAAAA;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    /* Polished Input Focus */
+    .stTextInput input, .stSelectbox [data-baseweb="select"] {
+        background-color: #0d0d0d !important;
+        border: 1px solid #333333 !important;
+        border-radius: 6px !important;
+        color: #FFFFFF !important;
+    }
+    .stTextInput input:focus, .stSelectbox [data-baseweb="select"]:focus-within {
+        border-color: #E50914 !important;
+        box-shadow: 0 0 0 1px #E50914 !important;
+    }
+
     /* Hero / Search Section Box */
     .hero-box {
         background: linear-gradient(180deg, #1f1f1f 0%, #171717 100%);
@@ -230,80 +265,90 @@ if movies_df is None or similarity_matrix is None:
 
 
 # -----------------------------------------------------------------------------
-# 4. Search & Selection Interface (Multi-field: Title, Director, Actor, Content)
+# 4. Search & Selection Interface
 # -----------------------------------------------------------------------------
 st.markdown("""
-<div class="hero-box">
-    <h3 style="margin-top: 0; color: #FFFFFF; font-size: 1.35rem;">Find Movies by Director, Actor, Theme, or Title</h3>
-    <p style="color: #CCCCCC; font-size: 0.92rem; margin-bottom: 0;">
-        Search any <strong>Director</strong> (e.g. <em>Christopher Nolan, Tarantino</em>), 
-        <strong>Lead Actor</strong> (e.g. <em>Leonardo DiCaprio, Tom Cruise</em>), 
-        <strong>Genre or Plot Theme</strong> (e.g. <em>Space, Zombie, Time Travel</em>), or <strong>Movie Title</strong>.
-        Our engine matches your search and computes pairwise <code>Cosine Similarity</code> recommendations.
+<div class="search-card">
+    <h3>🔍 Discover & Recommend Movies</h3>
+    <p>
+        Search by <strong>Movie Title</strong> (e.g. <em>Inception</em>), 
+        <strong>Director</strong> (e.g. <em>Christopher Nolan</em>), 
+        <strong>Lead Actor</strong> (e.g. <em>Leonardo DiCaprio</em>), or 
+        <strong>Plot Theme</strong> (e.g. <em>Space, Zombie, Time Travel</em>).
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 all_titles_list = sorted(list(movies_df['title'].unique()))
 
-col_search_box, col_count = st.columns([3, 1])
+# Clean Unified Controls Row
+col_search_box, col_count, col_btn = st.columns([5, 2, 2], vertical_alignment="bottom")
 
 with col_search_box:
     search_query = st.text_input(
-        "🔍 Search Director, Lead Actor, Content Theme, or Movie Title:",
-        placeholder="e.g. Christopher Nolan, Leonardo DiCaprio, Space, Zombie, Avatar...",
+        "Search Director, Actor, Theme, or Title:",
+        placeholder="Type e.g. Christopher Nolan, Leonardo DiCaprio, Space, Avatar...",
         help="Type any director name, actor name, plot keyword, genre, or movie title"
     )
 
 with col_count:
     num_recommendations = st.selectbox(
-        "Recommendations Count:",
+        "Recommendations:",
         options=[5, 6, 7, 8, 9, 10],
         index=0
     )
 
-# Filter catalog based on search query
+with col_btn:
+    recommend_button = st.button("🎬 Recommend", use_container_width=True)
+
+# Smart Filter & Movie Selection
 if search_query and search_query.strip():
     search_results, match_category = search_catalog(search_query, movies_df, top_k=50)
     if search_results.empty:
         st.markdown(f"""
         <div style="background-color: #2b1214; border-left: 5px solid #E50914; padding: 18px 24px; border-radius: 6px; margin-top: 15px; margin-bottom: 25px;">
-            <h3 style="color: #ff4b4b; margin: 0 0 8px 0; font-size: 1.25rem;">❌ Record Not Found / No Match Found</h3>
-            <p style="color: #FFFFFF; font-size: 1.0rem; margin: 0 0 6px 0;">
+            <h4 style="color: #ff4b4b; margin: 0 0 6px 0; font-size: 1.15rem;">❌ Record Not Found / No Match Found</h4>
+            <p style="color: #FFFFFF; font-size: 0.95rem; margin: 0 0 4px 0;">
                 No movie, director, actor, or theme matching <strong>"{search_query.strip()}"</strong> was found in the database.
             </p>
             <p style="color: #AAAAAA; font-size: 0.85rem; margin: 0;">
-                Please verify your spelling or try searching for a different movie, director, or actor.
+                Please verify your spelling or try searching for another movie, director, or actor.
             </p>
         </div>
         """, unsafe_allow_html=True)
         st.stop()
     else:
         available_options = search_results['title'].tolist()
-        st.markdown(
-            f"<div style='margin-bottom: 8px; color: #46d369; font-size: 0.95rem; font-weight: bold;'>"
-            f"✨ Found {len(search_results)} movies matching {match_category}: <em>'{search_query.strip()}'</em>"
-            f"</div>",
-            unsafe_allow_html=True
-        )
+        if len(available_options) > 1:
+            st.markdown(
+                f"<div style='margin-top: 10px; margin-bottom: 4px; color: #46d369; font-size: 0.9rem; font-weight: bold;'>"
+                f"✨ Found {len(available_options)} movies matching {match_category}: <em>'{search_query.strip()}'</em>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+            selected_movie = st.selectbox(
+                "Select specific movie from matching results:",
+                options=available_options,
+                index=0
+            )
+        else:
+            selected_movie = available_options[0]
+            st.markdown(
+                f"<div style='margin-top: 10px; margin-bottom: 4px; color: #46d369; font-size: 0.9rem; font-weight: bold;'>"
+                f"✨ Match Found: <strong>{selected_movie}</strong>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
 else:
-    available_options = all_titles_list
-
-col_select, col_btn = st.columns([3, 1])
-
-with col_select:
-    default_movie = "Avatar" if ("Avatar" in available_options and not search_query) else available_options[0]
-    default_index = available_options.index(default_movie) if default_movie in available_options else 0
+    # When no search query is active, browse full catalog cleanly
+    default_movie = "Avatar" if "Avatar" in all_titles_list else all_titles_list[0]
+    default_index = all_titles_list.index(default_movie) if default_movie in all_titles_list else 0
     selected_movie = st.selectbox(
-        "Select Movie to Recommend From:",
-        options=available_options,
+        "Or Select Directly from Full Movie Catalog (4,797 Titles):",
+        options=all_titles_list,
         index=default_index,
-        help="Select a movie from the search results to see detailed information and top recommendations"
+        help="Select any movie to view spotlight and compute recommendations"
     )
-
-with col_btn:
-    st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
-    recommend_button = st.button("🎬 Recommend Movies", use_container_width=True)
 
 # -----------------------------------------------------------------------------
 # 5. Selected Movie Spotlight

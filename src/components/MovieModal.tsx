@@ -17,16 +17,24 @@ export default function MovieModal({ movie, onClose, onRecommend }: MovieModalPr
   useEffect(() => {
     if (!movie) return;
 
+    if (movie.poster_url) setPosterUrl(movie.poster_url);
+    else setPosterUrl('/default_poster.png');
+
+    if (movie.backdrop_url) setBackdropUrl(movie.backdrop_url);
+    else setBackdropUrl(null);
+
     let isMounted = true;
-    fetch(`/api/poster/${movie.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted) {
-          if (data.poster) setPosterUrl(data.poster);
-          if (data.backdrop) setBackdropUrl(data.backdrop);
-        }
-      })
-      .catch(() => {});
+    if (!movie.poster_url || !movie.backdrop_url) {
+      fetch(`/api/poster/${movie.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (isMounted) {
+            if (data.poster && !movie.poster_url) setPosterUrl(data.poster);
+            if (data.backdrop && !movie.backdrop_url) setBackdropUrl(data.backdrop);
+          }
+        })
+        .catch(() => {});
+    }
 
     // Escape key listener to close
     const handleKeyDown = (e: KeyboardEvent) => {

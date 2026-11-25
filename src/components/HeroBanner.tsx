@@ -11,8 +11,7 @@ import {
   Clapperboard,
   ChevronLeft,
   ChevronRight,
-  Play,
-  Pause,
+  Film,
 } from 'lucide-react';
 
 interface HeroBannerProps {
@@ -35,35 +34,29 @@ export default function HeroBanner({
       : FEATURED_MOVIES;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [timerKey, setTimerKey] = useState(0);
 
   const currentMovie: Movie = playlist[currentIndex] || playlist[0];
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % playlist.length);
-    setTimerKey((k) => k + 1);
   }, [playlist.length]);
 
   const prevSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
-    setTimerKey((k) => k + 1);
   }, [playlist.length]);
 
   const goToSlide = (idx: number) => {
     setCurrentIndex(idx);
-    setTimerKey((k) => k + 1);
   };
 
-  // 5-second automatic movie rotation
+  // 5-second automatic movie rotation (runs silently in the background without timer bar)
   useEffect(() => {
-    if (isPaused) return;
     const interval = setInterval(() => {
       nextSlide();
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isPaused, nextSlide]);
+  }, [nextSlide]);
 
   // Preload all 15 movie posters & backdrops into browser cache
   useEffect(() => {
@@ -90,8 +83,6 @@ export default function HeroBanner({
     <div
       id="home"
       className="relative w-full min-h-[640px] md:min-h-[720px] lg:h-[84vh] max-h-[880px] flex items-center overflow-hidden select-none"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
     >
       {/* 1. Full-screen Cinematic Backdrop */}
       <div
@@ -129,11 +120,8 @@ export default function HeroBanner({
               FEATURED FILM
             </span>
             <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-300 bg-neutral-900/90 border border-neutral-700/80 px-2.5 py-0.5 rounded">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <Film className="w-3.5 h-3.5 text-neutral-400" />
               <span>{currentIndex + 1} of {playlist.length}</span>
-              <span className="text-[10px] text-neutral-400 font-mono">
-                ({isPaused ? 'Paused' : '5s auto-change'})
-              </span>
             </span>
             <span className="flex items-center gap-1 text-xs font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2.5 py-0.5 rounded">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -153,8 +141,12 @@ export default function HeroBanner({
             )}
           </div>
 
-          {/* Movie Title */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-3 drop-shadow-2xl">
+          {/* Movie Title (Clickable -> Opens Description Modal) */}
+          <h1
+            onClick={() => onMoreInfo(currentMovie)}
+            className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-3 drop-shadow-2xl cursor-pointer hover:text-neutral-200 transition-colors"
+            title="Click to view details"
+          >
             {currentMovie.title}
           </h1>
 
@@ -178,8 +170,12 @@ export default function HeroBanner({
             </p>
           )}
 
-          {/* Synopsis */}
-          <p className="text-sm md:text-base text-neutral-200 line-clamp-3 sm:line-clamp-4 mb-6 max-w-2xl drop-shadow-md leading-relaxed">
+          {/* Synopsis / Description (Clickable -> Opens Description Modal) */}
+          <p
+            onClick={() => onMoreInfo(currentMovie)}
+            className="text-sm md:text-base text-neutral-200 line-clamp-3 sm:line-clamp-4 mb-6 max-w-2xl drop-shadow-md leading-relaxed cursor-pointer hover:text-white transition-colors"
+            title="Click to view details"
+          >
             {currentMovie.overview}
           </p>
 
@@ -200,25 +196,18 @@ export default function HeroBanner({
               Details & Cast
             </button>
 
-            {/* Quick Carousel Controls */}
+            {/* Quick Next / Prev Arrows */}
             <div className="flex items-center gap-1.5 ml-auto sm:ml-2 bg-neutral-900/80 border border-neutral-800 rounded-md p-1 backdrop-blur-sm">
               <button
                 onClick={prevSlide}
-                className="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition"
+                className="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition cursor-pointer"
                 title="Previous Movie"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setIsPaused(!isPaused)}
-                className="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition"
-                title={isPaused ? 'Resume 5s timer' : 'Pause timer'}
-              >
-                {isPaused ? <Play className="w-3.5 h-3.5 text-emerald-400" /> : <Pause className="w-3.5 h-3.5" />}
-              </button>
-              <button
                 onClick={nextSlide}
-                className="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition"
+                className="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition cursor-pointer"
                 title="Next Movie"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -227,7 +216,7 @@ export default function HeroBanner({
           </div>
         </div>
 
-        {/* Right Column: Prominent High-Resolution Movie Poster Showcase */}
+        {/* Right Column: Prominent High-Resolution Movie Poster Showcase (Clickable -> Opens Description Modal) */}
         <div className="hidden md:flex flex-col items-center justify-center shrink-0">
           <div
             onClick={() => onMoreInfo(currentMovie)}
@@ -253,17 +242,8 @@ export default function HeroBanner({
         </div>
       </div>
 
-      {/* 4. Bottom 5-Second Progress Timer & 15 Navigation Pill Dots */}
-      <div className="absolute bottom-4 inset-x-0 z-20 px-4 md:px-12 flex flex-col gap-2 max-w-7xl mx-auto">
-        {/* Animated 5s Progress Bar */}
-        <div className="w-full h-1 bg-neutral-800/80 rounded-full overflow-hidden">
-          <div
-            key={timerKey}
-            className={`h-full bg-netflix-red ${isPaused ? 'w-full' : 'animate-progress-5s'}`}
-          />
-        </div>
-
-        {/* 15 Movie Dots / Pills */}
+      {/* 4. Bottom Navigation Dots */}
+      <div className="absolute bottom-4 inset-x-0 z-20 px-4 md:px-12 max-w-7xl mx-auto">
         <div className="flex items-center justify-center sm:justify-start gap-1.5 overflow-x-auto py-1 no-scrollbar">
           {playlist.map((m, idx) => (
             <button
@@ -272,8 +252,8 @@ export default function HeroBanner({
               title={`${idx + 1}. ${m.title} (${m.year})`}
               className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
                 idx === currentIndex
-                  ? 'w-8 bg-netflix-red shadow-lg shadow-netflix-red/50'
-                  : 'w-2 bg-neutral-600/70 hover:bg-neutral-400'
+                  ? 'w-7 bg-netflix-red shadow-lg shadow-netflix-red/50'
+                  : 'w-2 bg-neutral-600/60 hover:bg-neutral-400'
               }`}
             />
           ))}

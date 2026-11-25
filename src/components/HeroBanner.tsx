@@ -110,10 +110,10 @@ export default function HeroBanner({
 
       {/* 3. Foreground Content: Two Column Layout */}
       <div className="relative z-10 w-full px-4 md:px-12 max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 mt-12 md:mt-8">
-        
+
         {/* Left Column: Movie Information & Controls */}
         <div key={`info-${currentMovie.id}`} className="w-full md:max-w-2xl lg:max-w-3xl animate-fade-in">
-          
+
           {/* Header Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="bg-netflix-red text-white text-xs font-black px-2.5 py-0.5 rounded uppercase tracking-wider shadow">
@@ -250,11 +250,10 @@ export default function HeroBanner({
               key={m.id}
               onClick={() => goToSlide(idx)}
               title={`${idx + 1}. ${m.title} (${m.year})`}
-              className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
-                idx === currentIndex
+              className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${idx === currentIndex
                   ? 'w-7 bg-netflix-red shadow-lg shadow-netflix-red/50'
                   : 'w-2 bg-neutral-600/60 hover:bg-neutral-400'
-              }`}
+                }`}
             />
           ))}
         </div>

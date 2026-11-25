@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Movie } from '@/lib/types';
+import { FEATURED_MOVIES } from '@/lib/featuredMovies';
 import Navbar from '@/components/Navbar';
 import HeroBanner from '@/components/HeroBanner';
 import SearchSection from '@/components/SearchSection';
@@ -11,7 +12,7 @@ import MovieModal from '@/components/MovieModal';
 
 export default function HomePage() {
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
-  const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
+  const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(FEATURED_MOVIES[0]);
   const [collections, setCollections] = useState<{ title: string; movies: Movie[] }[]>([]);
   const [selectedMovieForModal, setSelectedMovieForModal] = useState<Movie | null>(null);
   const [selectedMovieForRecs, setSelectedMovieForRecs] = useState<Movie | null>(null);
@@ -96,14 +97,12 @@ export default function HomePage() {
       {/* Navigation Bar */}
       <Navbar onSearchClick={handleSearchClick} onRecsClick={handleRecsClick} />
 
-      {/* Hero Showcase Banner */}
-      {featuredMovie && (
-        <HeroBanner
-          movie={featuredMovie}
-          onMoreInfo={(m) => setSelectedMovieForModal(m)}
-          onRecommend={handleRecommendMovie}
-        />
-      )}
+      {/* Hero Showcase Banner (Cycles 15 iconic films with posters every 5 seconds) */}
+      <HeroBanner
+        movies={FEATURED_MOVIES}
+        onMoreInfo={(m) => setSelectedMovieForModal(m)}
+        onRecommend={handleRecommendMovie}
+      />
 
       {/* Multi-Field Search Section */}
       <SearchSection
